@@ -1,0 +1,13 @@
+name: tiaolong
+age: 18
+files: [a,b]
+spouse:
+  name: shendiao
+  age: 25
+sb:
+  - name0: duanyu
+    age0: 11
+  - name1: xuzhu
+    age1: 12
+  - name2: qiaofeng
+    age2: 13
