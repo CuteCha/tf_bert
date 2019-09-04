@@ -1,5 +1,5 @@
-input_files: [f1.txt, f2.txt] #指定输入文档路径
-ouput_files: [o1.txt, o2.txt] #指定输出路径
+input_file: ./data/i1.json #指定输入文档路径
+output_file: ./data/o1.tfrecords #指定输出路径
 vocab_file: vocab.txt #指定词典路径
 max_seq_length: 128 #每一条训练数据（两句话）相加后的最大长度限制
 short_seq_prob: 0.1 #为了缩小预训练和微调过程的差距，以此概率产生小于max_seq_length的训练数据

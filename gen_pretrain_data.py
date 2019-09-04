@@ -3,7 +3,9 @@ import yaml
 
 
 def main():
-    pass
+    conf = load_conf("./conf/gen_pretrain_data.yaml")
+    print(conf["input_file"])
+    print(conf["output_file"])
 
 
 def load_conf(path):
@@ -15,8 +17,8 @@ def get_docs():
     for line in open("./data/sample_text.txt"):
         line = line.strip()
         if line:
-            # docs[-1].append(line.split(" "))
-            docs[-1].append(line)
+            docs[-1].append(line.split(" "))
+            # docs[-1].append(line)
         else:
             docs.append([])
 
@@ -181,8 +183,8 @@ def load_tfrecords_sample():
 
 
 def some_test():
-    load_tfrecords_sample()
+    gen_json_sample()
 
 
 if __name__ == '__main__':
-    some_test()
+    main()
