@@ -52,22 +52,17 @@ flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 tf.flags.DEFINE_string(
     "tpu_name", None,
     "The Cloud TPU to use for training. This should be either the name "
-    "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 "
-    "url.")
+    "used when creating the Cloud TPU, or a grpc://ip.address.of.tpu:8470 url.")
 tf.flags.DEFINE_string(
     "tpu_zone", None,
     "[Optional] GCE zone where the Cloud TPU is located in. If not "
-    "specified, we will attempt to automatically detect the GCE project from "
-    "metadata.")
+    "specified, we will attempt to automatically detect the GCE project from metadata.")
 tf.flags.DEFINE_string(
     "gcp_project", None,
     "[Optional] Project name for the Cloud TPU-enabled project. If not "
-    "specified, we will attempt to automatically detect the GCE project from "
-    "metadata.")
+    "specified, we will attempt to automatically detect the GCE project from metadata.")
 tf.flags.DEFINE_string("master", None, "[Optional] TensorFlow master URL.")
-flags.DEFINE_integer(
-    "num_tpu_cores", 8,
-    "Only used if `use_tpu` is True. Total number of TPU cores to use.")
+flags.DEFINE_integer("num_tpu_cores", 8, "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 
 
 def model_fn_builder(bert_config, init_checkpoint, learning_rate, num_train_steps, num_warmup_steps, use_tpu, use_one_hot_embeddings):
@@ -90,13 +85,12 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate, num_train_step
 
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
-        model = modeling.BertModel(
-            config=bert_config,
-            is_training=is_training,
-            input_ids=input_ids,
-            input_mask=input_mask,
-            token_type_ids=segment_ids,
-            use_one_hot_embeddings=use_one_hot_embeddings)
+        model = modeling.BertModel(config=bert_config,
+                                   is_training=is_training,
+                                   input_ids=input_ids,
+                                   input_mask=input_mask,
+                                   token_type_ids=segment_ids,
+                                   use_one_hot_embeddings=use_one_hot_embeddings)
 
         masked_lm_loss, masked_lm_example_loss, masked_lm_log_probs = \
             get_masked_lm_output(bert_config, model.get_sequence_output(), model.get_embedding_table(), masked_lm_positions, masked_lm_ids, masked_lm_weights)
@@ -185,20 +179,17 @@ def get_masked_lm_output(bert_config, input_tensor, output_weights, positions, l
         # We apply one more non-linear transformation before the output layer.
         # This matrix is not used after pre-training.
         with tf.variable_scope("transform"):
-            input_tensor = tf.layers.dense(
-                input_tensor,
-                units=bert_config.hidden_size,
-                activation=modeling.get_activation(bert_config.hidden_act),
-                kernel_initializer=modeling.create_initializer(
-                    bert_config.initializer_range))
+            input_tensor = tf.layers.dense(input_tensor,
+                                           units=bert_config.hidden_size,
+                                           activation=modeling.get_activation(bert_config.hidden_act),
+                                           kernel_initializer=modeling.create_initializer(bert_config.initializer_range))
             input_tensor = modeling.layer_norm(input_tensor)
 
         # The output weights are the same as the input embeddings, but there is
         # an output-only bias for each token.
-        output_bias = tf.get_variable(
-            "output_bias",
-            shape=[bert_config.vocab_size],
-            initializer=tf.zeros_initializer())
+        output_bias = tf.get_variable("output_bias",
+                                      shape=[bert_config.vocab_size],
+                                      initializer=tf.zeros_initializer())
         logits = tf.matmul(input_tensor, output_weights, transpose_b=True)
         logits = tf.nn.bias_add(logits, output_bias)
         log_probs = tf.nn.log_softmax(logits, axis=-1)
@@ -206,8 +197,7 @@ def get_masked_lm_output(bert_config, input_tensor, output_weights, positions, l
         label_ids = tf.reshape(label_ids, [-1])
         label_weights = tf.reshape(label_weights, [-1])
 
-        one_hot_labels = tf.one_hot(
-            label_ids, depth=bert_config.vocab_size, dtype=tf.float32)
+        one_hot_labels = tf.one_hot(label_ids, depth=bert_config.vocab_size, dtype=tf.float32)
 
         # The `positions` tensor might be zero-padded (if the sequence is too
         # short to have the maximum number of predictions). The `label_weights`
@@ -251,11 +241,9 @@ def gather_indexes(sequence_tensor, positions):
     seq_length = sequence_shape[1]
     width = sequence_shape[2]
 
-    flat_offsets = tf.reshape(
-        tf.range(0, batch_size, dtype=tf.int32) * seq_length, [-1, 1])
+    flat_offsets = tf.reshape(tf.range(0, batch_size, dtype=tf.int32) * seq_length, [-1, 1])
     flat_positions = tf.reshape(positions + flat_offsets, [-1])
-    flat_sequence_tensor = tf.reshape(sequence_tensor,
-                                      [batch_size * seq_length, width])
+    flat_sequence_tensor = tf.reshape(sequence_tensor, [batch_size * seq_length, width])
     output_tensor = tf.gather(flat_sequence_tensor, flat_positions)
     return output_tensor
 
@@ -268,20 +256,13 @@ def input_fn_builder(input_files, max_seq_length, max_predictions_per_seq, is_tr
         batch_size = params["batch_size"]
 
         name_to_features = {
-            "input_ids":
-                tf.FixedLenFeature([max_seq_length], tf.int64),
-            "input_mask":
-                tf.FixedLenFeature([max_seq_length], tf.int64),
-            "segment_ids":
-                tf.FixedLenFeature([max_seq_length], tf.int64),
-            "masked_lm_positions":
-                tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
-            "masked_lm_ids":
-                tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
-            "masked_lm_weights":
-                tf.FixedLenFeature([max_predictions_per_seq], tf.float32),
-            "next_sentence_labels":
-                tf.FixedLenFeature([1], tf.int64),
+            "input_ids": tf.FixedLenFeature([max_seq_length], tf.int64),
+            "input_mask": tf.FixedLenFeature([max_seq_length], tf.int64),
+            "segment_ids": tf.FixedLenFeature([max_seq_length], tf.int64),
+            "masked_lm_positions": tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
+            "masked_lm_ids": tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
+            "masked_lm_weights": tf.FixedLenFeature([max_predictions_per_seq], tf.float32),
+            "next_sentence_labels": tf.FixedLenFeature([1], tf.int64),
         }
 
         # For training, we want a lot of parallel reading and shuffling.
@@ -296,11 +277,9 @@ def input_fn_builder(input_files, max_seq_length, max_predictions_per_seq, is_tr
 
             # `sloppy` mode means that the interleaving is not exact. This adds
             # even more randomness to the training pipeline.
-            d = d.apply(
-                tf.contrib.data.parallel_interleave(
-                    tf.data.TFRecordDataset,
-                    sloppy=is_training,
-                    cycle_length=cycle_length))
+            d = d.apply(tf.contrib.data.parallel_interleave(tf.data.TFRecordDataset,
+                                                            sloppy=is_training,
+                                                            cycle_length=cycle_length))
             d = d.shuffle(buffer_size=100)
         else:
             d = tf.data.TFRecordDataset(input_files)
@@ -312,12 +291,10 @@ def input_fn_builder(input_files, max_seq_length, max_predictions_per_seq, is_tr
         # size dimensions. For eval, we assume we are evaluating on the CPU or GPU
         # and we *don't* want to drop the remainder, otherwise we wont cover
         # every sample.
-        d = d.apply(
-            tf.contrib.data.map_and_batch(
-                lambda record: _decode_record(record, name_to_features),
-                batch_size=batch_size,
-                num_parallel_batches=num_cpu_threads,
-                drop_remainder=True))
+        d = d.apply(tf.contrib.data.map_and_batch(lambda record: _decode_record(record, name_to_features),
+                                                  batch_size=batch_size,
+                                                  num_parallel_batches=num_cpu_threads,
+                                                  drop_remainder=True))
         return d
 
     return input_fn

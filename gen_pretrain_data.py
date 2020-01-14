@@ -118,8 +118,7 @@ def gen_tfrecords_sample():
                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     masked_lm_positions = [6, 7, 29, 30, 33, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     masked_lm_ids = [6528, 25499, 2751, 1011, 16220, 20771, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    masked_lm_weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                         0.0]
+    masked_lm_weights = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     next_sentence_label = 0
 
     features = collections.OrderedDict()
@@ -141,20 +140,13 @@ def load_tfrecords_sample():
     max_seq_length = 128
     max_predictions_per_seq = 20  # max_seq_length*0.15
     features = {
-        "input_ids":
-            tf.FixedLenFeature([max_seq_length], tf.int64),
-        "input_mask":
-            tf.FixedLenFeature([max_seq_length], tf.int64),
-        "segment_ids":
-            tf.FixedLenFeature([max_seq_length], tf.int64),
-        "masked_lm_positions":
-            tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
-        "masked_lm_ids":
-            tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
-        "masked_lm_weights":
-            tf.FixedLenFeature([max_predictions_per_seq], tf.float32),
-        "next_sentence_labels":
-            tf.FixedLenFeature([1], tf.int64),
+        "input_ids": tf.FixedLenFeature([max_seq_length], tf.int64),
+        "input_mask": tf.FixedLenFeature([max_seq_length], tf.int64),
+        "segment_ids": tf.FixedLenFeature([max_seq_length], tf.int64),
+        "masked_lm_positions": tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
+        "masked_lm_ids": tf.FixedLenFeature([max_predictions_per_seq], tf.int64),
+        "masked_lm_weights": tf.FixedLenFeature([max_predictions_per_seq], tf.float32),
+        "next_sentence_labels": tf.FixedLenFeature([1], tf.int64),
     }
 
     input_file = "./data/train.tfrecords"
