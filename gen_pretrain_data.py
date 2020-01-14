@@ -62,6 +62,7 @@ def gen_sample():
                     is_random_next = True
                     target_b_length = target_seq_length - len(tokens_a)
 
+                    random_document_index = 0
                     for _ in range(10):
                         random_document_index = rng.randint(0, len(all_documents) - 1)
                         if random_document_index != document_index:
@@ -98,7 +99,8 @@ def gen_tfrecords_sample():
     import tensorflow as tf
     output_file = "./data/train.tfrecords"
 
-    if tf.gfile.Exists(output_file): tf.gfile.Remove(output_file)
+    if tf.gfile.Exists(output_file):
+        tf.gfile.Remove(output_file)
     writer = tf.python_io.TFRecordWriter(output_file)
 
     input_ids = [101, 2559, 2012, 2009, 2062, 2012, 103, 103, 1010, 2002, 2387, 2008, 2009, 8501, 1996, 9315, 1010,
@@ -127,8 +129,7 @@ def gen_tfrecords_sample():
     features["masked_lm_positions"] = tf.train.Feature(int64_list=tf.train.Int64List(value=list(masked_lm_positions)))
     features["masked_lm_ids"] = tf.train.Feature(int64_list=tf.train.Int64List(value=list(masked_lm_ids)))
     features["masked_lm_weights"] = tf.train.Feature(float_list=tf.train.FloatList(value=list(masked_lm_weights)))
-    features["next_sentence_labels"] = tf.train.Feature(
-        int64_list=tf.train.Int64List(value=list([next_sentence_label])))
+    features["next_sentence_labels"] = tf.train.Feature(int64_list=tf.train.Int64List(value=list([next_sentence_label])))
 
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
 
@@ -138,7 +139,7 @@ def gen_tfrecords_sample():
 def load_tfrecords_sample():
     import tensorflow as tf
     max_seq_length = 128
-    max_predictions_per_seq = 20
+    max_predictions_per_seq = 20  # max_seq_length*0.15
     features = {
         "input_ids":
             tf.FixedLenFeature([max_seq_length], tf.int64),
@@ -178,8 +179,8 @@ def load_tfrecords_sample():
             while True:
                 data_record = sess.run(next_element)
                 print(data_record)
-        except Exception:
-            print("end!")
+        except Exception as e:
+            print("end! e={}".format(e))
 
 
 def some_test():
